@@ -11,7 +11,6 @@ using namespace std;
 #define MINAREA 120
 
 int main(int argc, char** argv) {
-	int a=0;
 	RNG rng(12345);
 	Mat frame;
 	Mat fgMaskMOG2, fgMaskKNN;
