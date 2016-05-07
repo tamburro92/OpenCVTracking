@@ -11,6 +11,7 @@ using namespace std;
 #define MINAREA 120
 
 int main(int argc, char** argv) {
+	int a=0;
 	RNG rng(12345);
 	Mat frame;
 	Mat fgMaskMOG2, fgMaskKNN;
@@ -33,7 +34,8 @@ int main(int argc, char** argv) {
 	if (!src.isOpened())
 		exit(EXIT_FAILURE);
 
-	Ptr<BackgroundSubtractor> backGroundSubMOG2 = new BackgroundSubtractorMOG2();
+	Ptr<BackgroundSubtractor> backGroundSubMOG2 =
+			new BackgroundSubtractorMOG2();
 
 	while ((char) keyboard != 'q') {
 		if (!src.read(frame)) {
@@ -71,9 +73,9 @@ int main(int argc, char** argv) {
 			cout << "Center : " << center[i] << endl;
 			cout << "Area : " << contourArea(contours[i]) << endl;
 
-
-			if (contourArea(contours[i]) > MINAREA)//FUNZIONE per calcolare l'area dei BLOBs
-				drawContours(drawing, contours, (int) i, color, 2, 8, noArray(),0, Point());
+			if (contourArea(contours[i]) > MINAREA) //FUNZIONE per calcolare l'area dei BLOBs
+				drawContours(drawing, contours, (int) i, color, 2, 8, noArray(),
+						0, Point());
 
 		}
 
