@@ -9,7 +9,7 @@
 using namespace cv;
 using namespace std;
 
-#define MINAREA 80
+#define MINAREA 120
 
 int main(int argc, char** argv) {
 	RNG rng(12345);
