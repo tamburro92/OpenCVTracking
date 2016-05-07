@@ -1,0 +1,95 @@
+#include <core.hpp>
+#include <highgui.hpp>
+#include <imgproc.hpp>
+#include <video.hpp>
+#include <iostream>
+#include "opencv2/videoio.hpp"
+#include "MatrixSimilarity.hpp"
+
+using namespace cv;
+using namespace std;
+
+#define MINAREA 80
+
+int main(int argc, char** argv) {
+	RNG rng(12345);
+	Mat frame;
+	Mat fgMaskMOG2, fgMaskKNN;
+	Mat out;
+	Mat kernelErosion = getStructuringElement(MORPH_RECT, Size(3, 3),
+			Point(-1, -1));
+	Mat kernelDilatation = getStructuringElement(MORPH_RECT, Size(3, 3),
+			Point(-1, -1));
+
+	int keyboard;
+
+	VideoCapture src("video.avi");
+
+	namedWindow("Frame");
+	namedWindow("FG Mask MOG 2");
+	moveWindow("FG Mask MOG 2", 0, 500);
+	namedWindow("FG Mask MOG 2 Filtered");
+	moveWindow("FG Mask MOG 2 Filtered", 500, 0);
+
+	if (!src.isOpened())
+		exit(EXIT_FAILURE);
+
+	Ptr<BackgroundSubtractor> backGroundSubMOG2 =
+			createBackgroundSubtractorMOG2(2000, 100, true);
+
+	while ((char) keyboard != 'q') {
+		if (!src.read(frame)) {
+			cout << "error_in_read_frame" << endl;
+			exit(EXIT_FAILURE);
+		}
+
+		//	GaussianBlur( frame, frame, Size( 3, 3 ), 0, 0 );
+		backGroundSubMOG2->apply(frame, fgMaskMOG2);
+
+		imshow("FG Mask MOG 2", fgMaskMOG2);
+		erode(fgMaskMOG2, fgMaskMOG2, kernelErosion); //Applico Erosione
+		dilate(fgMaskMOG2, fgMaskMOG2, kernelDilatation); //Applico Dilatazione
+		imshow("FG Mask MOG 2 Filtered", fgMaskMOG2);
+
+		vector<vector<Point> > contours;
+		//trova tutti i contorni dei BLOBS
+		findContours(fgMaskMOG2, contours, RETR_TREE, CHAIN_APPROX_SIMPLE,
+				Point(0, 0));
+		Mat drawing = Mat::zeros(fgMaskMOG2.size(), CV_8UC3);
+
+		/// Approximate contours to polygons + get bounding rects and circles
+		vector<vector<Point> > contours_poly(contours.size());
+		vector<Point2f> center(contours.size());
+		vector<float> radius(contours.size());
+
+		for (size_t i = 0; i < contours.size(); i++) {
+			Scalar color = Scalar(rng.uniform(0, 255), rng.uniform(0, 255),
+					rng.uniform(0, 255));
+
+			///funzioni per calcolare il centro dei blob
+			approxPolyDP(Mat(contours[i]), contours_poly[i], 3, true); //approssima il contorno in un polinomio
+			minEnclosingCircle((Mat) contours_poly[i], center[i], radius[i]);
+
+			cout << "Center : " << center[i] << endl;
+			cout << "Area : " << contourArea(contours[i]) << endl;
+
+
+			if (contourArea(contours[i]) > MINAREA)//FUNZIONE per calcolare l'area dei BLOBs
+				drawContours(drawing, contours, (int) i, color, 2, 8, noArray(),0, Point());
+
+		}
+
+		MatrixSimilarity m(3, 3);
+
+		//m.~MatrixSimilarity();
+
+		imshow("FG Mask MOG 2 blobs", drawing);
+		imshow("Frame", frame);
+		waitKey();
+
+		keyboard = waitKey(30);
+
+	}
+
+}
+
