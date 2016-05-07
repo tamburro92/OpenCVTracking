@@ -8,7 +8,6 @@
 using namespace cv;
 using namespace std;
 
-
 #define MINAREA 120
 
 int main(int argc, char** argv) {

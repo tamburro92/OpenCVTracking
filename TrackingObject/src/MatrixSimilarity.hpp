@@ -11,6 +11,7 @@ using std::vector;
 
 class MatrixSimilarity {
 private:
+
 public:
 
 	int rows;
