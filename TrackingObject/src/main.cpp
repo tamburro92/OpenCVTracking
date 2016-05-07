@@ -103,6 +103,7 @@ int main(int argc, char** argv) {
 		cout<<"DOPO"<<endl;
 		cout<<m<<endl<<endl;
 
+
 		cout<<"BLOB: "<<m.remainBlobs().size()<<endl;
 		cout<<"Obj: "<<m.remainObjects().size()<<endl;
 

@@ -8,6 +8,7 @@ using std::vector;
 
 #define DMAX 3
 #define MINVALUE -1000
+
 class MatrixSimilarity {
 private:
 public:
