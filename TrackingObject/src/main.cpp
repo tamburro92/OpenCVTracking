@@ -8,10 +8,10 @@
 using namespace cv;
 using namespace std;
 
+
 #define MINAREA 120
 
 int main(int argc, char** argv) {
-	int a=0;
 	RNG rng(12345);
 	Mat frame;
 	Mat fgMaskMOG2, fgMaskKNN;
@@ -80,6 +80,34 @@ int main(int argc, char** argv) {
 		}
 
 		MatrixSimilarity m(3, 3);
+		m.matrix[0][0]=2;m.matrix[0][1]=1;m.matrix[0][2]=1.3;
+		m.matrix[1][0]=4;m.matrix[1][1]=2.1;m.matrix[1][2]=1.1;
+		cout<<"BLOB: "<<m.remainBlobs().size()<<endl;
+		cout<<"Obj: "<<m.remainObjects().size()<<endl;
+		cout<<m<<endl;
+
+		std::vector<float> max=m.maxMatrix();
+		cout<<max[0]<<" "<<max[1]<<" "<<max[2]<<endl;
+		m.deleteFromMatrix(max[0],max[1]);
+		cout<<"BLOB: "<<m.remainBlobs().size()<<endl;
+		cout<<"Obj: "<<m.remainObjects().size()<<endl;
+		cout<<"DOPO"<<endl;
+		cout<<m<<endl;
+
+
+		max=m.maxMatrix();
+		cout<<max[0]<<" "<<max[1]<<" "<<max[2]<<endl;
+		m.deleteFromMatrix(max[0],max[1]);
+		cout<<"BLOB: "<<m.remainBlobs().size()<<endl;
+		cout<<"Obj: "<<m.remainObjects().size()<<endl;
+		cout<<"DOPO"<<endl;
+		cout<<m<<endl<<endl;
+
+		cout<<"BLOB: "<<m.remainBlobs().size()<<endl;
+		cout<<"Obj: "<<m.remainObjects().size()<<endl;
+
+
+
 
 		//m.~MatrixSimilarity();
 

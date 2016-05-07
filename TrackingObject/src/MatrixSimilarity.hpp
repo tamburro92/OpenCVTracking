@@ -7,6 +7,7 @@ using namespace std;
 using std::vector;
 
 #define DMAX 3
+#define MINVALUE -1000
 class MatrixSimilarity {
 private:
 public:
@@ -14,6 +15,8 @@ public:
 	int rows;
 	int cols;
 	float** matrix;
+	std::vector<bool> isObjectDeleted;
+	std::vector<bool> isBlobsDeleted;
 
 	MatrixSimilarity(int r, int c) {
 		rows = r;
@@ -21,6 +24,11 @@ public:
 		matrix = new float*[rows];
 		for (int i = 0; i < rows; i++)
 			matrix[i] = new float[cols];
+
+		for (int i = 0; i < rows; isBlobsDeleted.push_back(false), i++)
+			;
+		for (int i = 0; i < cols; isObjectDeleted.push_back(false), i++)
+			;
 		fillMatrixReset();
 	}
 	~MatrixSimilarity() {
@@ -31,34 +39,34 @@ public:
 		cols = 0;
 	}
 
-	bool deleteFromMatrix(int r, int c) {
-		if (r > rows || c > cols)
+	bool deleteFromMatrix(int blob, int obj) {
+		if (blob > rows || obj > cols)
 			return false;
-		for (int i = 0; i < rows; i++) {
-			matrix[i][c] = FLT_MIN;
-		}
-		for (int i = 0; i < cols; i++) {
-			matrix[r][i] = FLT_MIN;
-		}
+		isBlobsDeleted[blob] = true;
+		isObjectDeleted[obj] = true;
 		return true;
 
 	}
-	void calculateMatrix(std::vector<Point2f> blobs, std::vector<Point2f> objs) {
-			for (int i = 0; i < rows; i++)
-				for (int j = 0; j < cols; j++)
-					if(cv::norm(blobs[i]-objs[j])<DMAX)
-					     matrix[i][j] = 1-cv::norm(blobs[i]-objs[j])/DMAX;
+	void calculateMatrix(std::vector<Point2f> blobs,
+			std::vector<Point2f> objs) {
+		for (int i = 0; i < rows; i++)
+			for (int j = 0; j < cols; j++)
+				if (cv::norm(blobs[i] - objs[j]) < DMAX)
+					matrix[i][j] = 1 - cv::norm(blobs[i] - objs[j]) / DMAX;
 
-
-		}
+	}
 	std::vector<float> maxMatrix() {
 		std::vector<float> maxPoint;
 
-		float maxValue = FLT_MIN;
+		float maxValue = MINVALUE;
 		int rowMax = -1;
 		int colMax = -1;
 		for (int i = 0; i < rows; i++) {
+			if (isBlobsDeleted[i])
+				continue;
 			for (int j = 0; j < cols; j++) {
+				if (isObjectDeleted[j])
+					continue;
 				if (matrix[i][j] > maxValue) {
 					maxValue = matrix[i][j];
 					rowMax = i;
@@ -67,40 +75,26 @@ public:
 
 			}
 		}
-		maxPoint.push_back(maxValue);
 		maxPoint.push_back(rowMax);
 		maxPoint.push_back(colMax);
+		maxPoint.push_back(maxValue);
 		return maxPoint;
 	}
 	std::vector<int> remainBlobs() {
 		std::vector<int> blobs;
-		bool deleted = false;
-		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < cols; j++) {
-				if (matrix[i][j] == FLT_MIN)
-					deleted = true;
-			}
-			if (!deleted)
+		for (int i = 0; i < rows; i++)
+			if (!isBlobsDeleted[i])
 				blobs.push_back(i);
-			deleted = false;
 
-		}
 		return blobs;
 	}
 	std::vector<int> remainObjects() {
-		std::vector<int> blobs;
-		bool deleted = false;
-		for (int j = 0; j < rows; j++) {
-			for (int i = 0; i < cols; i++) {
-				if (matrix[i][j] == FLT_MIN)
-					deleted = true;
-			}
-			if (!deleted)
-				blobs.push_back(j);
-			deleted = false;
+		std::vector<int> obj;
+		for (int i = 0; i < cols; i++)
+			if (!isObjectDeleted[i])
+				obj.push_back(i);
 
-		}
-		return blobs;
+		return obj;
 	}
 	void fillMatrixReset() {
 		for (int i = 0; i < rows; i++)
@@ -109,3 +103,16 @@ public:
 
 	}
 };
+
+ostream &operator<<(ostream &os, const MatrixSimilarity &matrix) {
+	for (int i = 0; i < matrix.rows; i++) {
+		for (int j = 0; j < matrix.cols; j++) {
+			if (matrix.isBlobsDeleted[i] || matrix.isObjectDeleted[j])
+				os << "D" << " ";
+			else
+				os << matrix.matrix[i][j] << " ";
+		}
+		os << endl;
+	}
+	return os;
+}
