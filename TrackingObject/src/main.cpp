@@ -1,9 +1,8 @@
-#include <core.hpp>
-#include <highgui.hpp>
-#include <imgproc.hpp>
-#include <video.hpp>
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/video/video.hpp>
 #include <iostream>
-#include "opencv2/videoio.hpp"
 #include "MatrixSimilarity.hpp"
 
 using namespace cv;
@@ -34,8 +33,7 @@ int main(int argc, char** argv) {
 	if (!src.isOpened())
 		exit(EXIT_FAILURE);
 
-	Ptr<BackgroundSubtractor> backGroundSubMOG2 =
-			createBackgroundSubtractorMOG2(2000, 100, true);
+	Ptr<BackgroundSubtractor> backGroundSubMOG2 = new BackgroundSubtractorMOG2();
 
 	while ((char) keyboard != 'q') {
 		if (!src.read(frame)) {
@@ -44,7 +42,7 @@ int main(int argc, char** argv) {
 		}
 
 		//	GaussianBlur( frame, frame, Size( 3, 3 ), 0, 0 );
-		backGroundSubMOG2->apply(frame, fgMaskMOG2);
+		backGroundSubMOG2->operator ()(frame, fgMaskMOG2);
 
 		imshow("FG Mask MOG 2", fgMaskMOG2);
 		erode(fgMaskMOG2, fgMaskMOG2, kernelErosion); //Applico Erosione
