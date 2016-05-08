@@ -125,7 +125,7 @@ int main(int argc, char** argv) {
 		imshow("Frame", frame);
 		waitKey();
 
-		//keyboard = waitKey(30);
+		keyboard = waitKey(30);
 
 	}
 
