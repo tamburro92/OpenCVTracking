@@ -5,6 +5,8 @@
 #include <opencv2/core/core.hpp>
 #include <iostream>
 
+#define DMAX 3 //Distanza MAX Algoritmo
+#define MINVALUE -1000 //Valore minimo della matrice di similiraità
 
 class MatrixSimilarity {
 private:

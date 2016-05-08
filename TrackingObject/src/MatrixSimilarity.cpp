@@ -7,9 +7,6 @@ using namespace cv;
 using namespace std;
 using std::vector;
 
-#define DMAX 3 //Distanza MAX Algoritmo
-#define MINVALUE -1000 //Valore minimo della matrice di similiraità
-
 MatrixSimilarity::MatrixSimilarity(int r, int c) {
 	rows = r;
 	cols = c;
