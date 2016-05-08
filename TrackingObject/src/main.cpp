@@ -118,7 +118,6 @@ int main(int argc, char** argv) {
 
 		cout << "BLOB: " << m.remainBlobs().size() << endl;
 		cout << "Obj: " << m.remainObjects().size() << endl;
-
 		//m.~MatrixSimilarity();
 
 		imshow("FG Mask MOG 2 blobs", drawing);

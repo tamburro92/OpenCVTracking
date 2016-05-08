@@ -154,26 +154,28 @@ public:
 				matrix[i][j] = MINVALUE;
 
 	}
+
+	/**
+	 * Overload dell'operatore << usato per stampare l'oggetto matrix,
+	 * la funzione è standard per tutti gli overload <<
+	 *
+	 *
+	 * @param os
+	 * @param matrix
+	 * @return ostream concatenato a matrix
+	 */
+	friend ostream &operator<<(ostream &os, const MatrixSimilarity &matrix) {
+		for (int i = 0; i < matrix.rows; i++) {
+			for (int j = 0; j < matrix.cols; j++) {
+				if (matrix.isBlobsDeleted[i] || matrix.isObjectDeleted[j])
+					os << "D" << " ";
+				else
+					os << matrix.matrix[i][j] << " ";
+			}
+			os << endl;
+		}
+		return os;
+	}
 };
 
-/**
- * Overload dell'operatore << usato per stampare l'oggetto matrix,
- * la funzione è standard per tutti gli overload <<
- *
- *
- * @param os
- * @param matrix
- * @return ostream concatenato a matrix
- */
-ostream &operator<<(ostream &os, const MatrixSimilarity &matrix) {
-	for (int i = 0; i < matrix.rows; i++) {
-		for (int j = 0; j < matrix.cols; j++) {
-			if (matrix.isBlobsDeleted[i] || matrix.isObjectDeleted[j])
-				os << "D" << " ";
-			else
-				os << matrix.matrix[i][j] << " ";
-		}
-		os << endl;
-	}
-	return os;
-}
+
