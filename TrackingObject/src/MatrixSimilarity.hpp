@@ -1,11 +1,10 @@
-#ifndef MATRIXSIMILARITY_HPP
-#define MATRIXSIMILARITY_HPP
+#ifndef MATRIXSIMILARITY_HPP_
+#define MATRIXSIMILARITY_HPP_
 
 #include <cfloat>
 #include <opencv2/core/core.hpp>
 #include <iostream>
 
-namespace matrixSimilarity {
 
 class MatrixSimilarity {
 private:
@@ -84,6 +83,6 @@ public:
 	 */
 	friend std::ostream &operator<<(std::ostream &os, const MatrixSimilarity &matrix);
 };
-}
+
 
 #endif

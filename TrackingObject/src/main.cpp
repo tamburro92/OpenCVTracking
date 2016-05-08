@@ -7,7 +7,6 @@
 
 using namespace cv;
 using namespace std;
-using namespace matrixSimilarity;
 
 
 #define MINAREA 120
