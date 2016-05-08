@@ -6,8 +6,8 @@ using namespace cv;
 using namespace std;
 using std::vector;
 
-#define DMAX 3
-#define MINVALUE -1000
+#define DMAX 3 //Distanza MAX Algoritmo
+#define MINVALUE -1000 //Valore minimo della matrice di similiraità
 
 class MatrixSimilarity {
 private:
@@ -20,7 +20,12 @@ public:
 	std::vector<bool> isObjectDeleted;
 	std::vector<bool> isBlobsDeleted;
 
-	// Costruttore che inizializza la matrice di similarita'
+	/**
+	 * Costruttore di @class MatrixSimilarity
+	 *
+	 * @param r numero di Blobs
+	 * @param c numero di Oggetti
+	 */
 	MatrixSimilarity(int r, int c) {
 		rows = r;
 		cols = c;
@@ -37,7 +42,9 @@ public:
 		fillMatrixReset();
 	}
 
-	// Distruttore
+	/**
+	 * Distruttore
+	 */
 	~MatrixSimilarity() {
 		for (int i = 0; i < rows; ++i) {
 			delete[] matrix[i];
@@ -47,8 +54,14 @@ public:
 		cols = 0;
 	}
 
-	// Rimuove dalla matrice il blob e l'oggetto una volta fatta l'associazione
-	// Per rimozione si intende mettere a true il relativo blob/oggetto nel rispettivo valore
+	/**
+	 * Rimuove dalla matrice il blob e l'oggetto una volta fatta l'associazione
+	 * Per rimozione si intende mettere a true il relativo blob/oggetto nel rispettivo valore
+	 *
+	 * @param blob
+	 * @param obj
+	 * @return risultato dell'operazione
+	 */
 	bool deleteFromMatrix(int blob, int obj) {
 		if (blob > rows || obj > cols) {
 			return false;
@@ -59,7 +72,12 @@ public:
 
 	}
 
-	// Calcolo della matrice di similarita'
+	/**
+	 * Calcolo della matrice di similarita'
+	 *
+	 * @param blobs Posizione dei blobs
+	 * @param objs  Posizione degli oggetti
+	 */
 	void calculateMatrix(std::vector<Point2f> blobs,
 			std::vector<Point2f> objs) {
 		for (int i = 0; i < rows; i++)
@@ -69,8 +87,12 @@ public:
 
 	}
 
-	// Calcola il massimo della matrice di similarita'
-	// Nel caso si consideri un valore presente isBlobsDeleted o isObjectDeleted esso non viene considerato
+	/**
+	 * Calcola il massimo della matrice di similarita'
+	 * Nel caso si consideri un valore presente isBlobsDeleted o isObjectDeleted esso non viene considerato
+	 *
+	 * @return vettore di 3 dimensioni contenente la posizione riga,colonna e il valoreMAx
+	 */
 	std::vector<float> maxMatrix() {
 		std::vector<float> maxPoint; // contiene: riga del valore massimo, colonna del valore massimo, valore massimo
 
@@ -97,7 +119,10 @@ public:
 		return maxPoint;
 	}
 
-	// Ritorna i blob di cui non e' stata fatta alcuna associazione
+	/**
+	 *
+	 * @return Ritorna i blob di cui non e' stata fatta alcuna associazione
+	 */
 	std::vector<int> remainBlobs() {
 		std::vector<int> blobs;
 		for (int i = 0; i < rows; i++)
@@ -107,7 +132,10 @@ public:
 		return blobs;
 	}
 
-	// Ritorna gli oggetti di cui non e' stata fatta alcuna associazione
+	/**
+	 *
+	 * @return Ritorna gli oggetti di cui non e' stata fatta alcuna associazione
+	 */
 	std::vector<int> remainObjects() {
 		std::vector<int> obj;
 		for (int i = 0; i < cols; i++)
@@ -117,15 +145,26 @@ public:
 		return obj;
 	}
 
-	// Inizializza la matrice assegnando 0 a tutte le celle
+	/**
+	 * Inizializza la matrice assegnando 0 a tutte le celle
+	 */
 	void fillMatrixReset() {
 		for (int i = 0; i < rows; i++)
 			for (int j = 0; j < cols; j++)
-				matrix[i][j] = 0;
+				matrix[i][j] = MINVALUE;
 
 	}
 };
 
+/**
+ * Overload dell'operatore << usato per stampare l'oggetto matrix,
+ * la funzione è standard per tutti gli overload <<
+ *
+ *
+ * @param os
+ * @param matrix
+ * @return ostream concatenato a matrix
+ */
 ostream &operator<<(ostream &os, const MatrixSimilarity &matrix) {
 	for (int i = 0; i < matrix.rows; i++) {
 		for (int j = 0; j < matrix.cols; j++) {
