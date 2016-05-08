@@ -20,35 +20,46 @@ public:
 	std::vector<bool> isObjectDeleted;
 	std::vector<bool> isBlobsDeleted;
 
+	// Costruttore che inizializza la matrice di similarita'
 	MatrixSimilarity(int r, int c) {
 		rows = r;
 		cols = c;
 		matrix = new float*[rows];
-		for (int i = 0; i < rows; i++)
+		for (int i = 0; i < rows; i++) {
 			matrix[i] = new float[cols];
+		}
 
+		// push_back aggiunge un nuovo elemento alla fine del vettore
 		for (int i = 0; i < rows; isBlobsDeleted.push_back(false), i++)
 			;
 		for (int i = 0; i < cols; isObjectDeleted.push_back(false), i++)
 			;
 		fillMatrixReset();
 	}
+
+	// Distruttore
 	~MatrixSimilarity() {
-		for (int i = 0; i < rows; ++i)
+		for (int i = 0; i < rows; ++i) {
 			delete[] matrix[i];
+		}
 		delete[] matrix;
 		rows = 0;
 		cols = 0;
 	}
 
+	// Rimuove dalla matrice il blob e l'oggetto una volta fatta l'associazione
+	// Per rimozione si intende mettere a true il relativo blob/oggetto nel rispettivo valore
 	bool deleteFromMatrix(int blob, int obj) {
-		if (blob > rows || obj > cols)
+		if (blob > rows || obj > cols) {
 			return false;
+		}
 		isBlobsDeleted[blob] = true;
 		isObjectDeleted[obj] = true;
 		return true;
 
 	}
+
+	// Calcolo della matrice di similarita'
 	void calculateMatrix(std::vector<Point2f> blobs,
 			std::vector<Point2f> objs) {
 		for (int i = 0; i < rows; i++)
@@ -57,17 +68,20 @@ public:
 					matrix[i][j] = 1 - cv::norm(blobs[i] - objs[j]) / DMAX;
 
 	}
+
+	// Calcola il massimo della matrice di similarita'
+	// Nel caso si consideri un valore presente isBlobsDeleted o isObjectDeleted esso non viene considerato
 	std::vector<float> maxMatrix() {
-		std::vector<float> maxPoint;
+		std::vector<float> maxPoint; // contiene: riga del valore massimo, colonna del valore massimo, valore massimo
 
 		float maxValue = MINVALUE;
 		int rowMax = -1;
 		int colMax = -1;
 		for (int i = 0; i < rows; i++) {
-			if (isBlobsDeleted[i])
+			if (isBlobsDeleted[i]) // il blob e' stato gia' associato
 				continue;
 			for (int j = 0; j < cols; j++) {
-				if (isObjectDeleted[j])
+				if (isObjectDeleted[j]) // l'oggetto e' stato gia' associato
 					continue;
 				if (matrix[i][j] > maxValue) {
 					maxValue = matrix[i][j];
@@ -82,6 +96,8 @@ public:
 		maxPoint.push_back(maxValue);
 		return maxPoint;
 	}
+
+	// Ritorna i blob di cui non e' stata fatta alcuna associazione
 	std::vector<int> remainBlobs() {
 		std::vector<int> blobs;
 		for (int i = 0; i < rows; i++)
@@ -90,6 +106,8 @@ public:
 
 		return blobs;
 	}
+
+	// Ritorna gli oggetti di cui non e' stata fatta alcuna associazione
 	std::vector<int> remainObjects() {
 		std::vector<int> obj;
 		for (int i = 0; i < cols; i++)
@@ -98,6 +116,8 @@ public:
 
 		return obj;
 	}
+
+	// Inizializza la matrice assegnando 0 a tutte le celle
 	void fillMatrixReset() {
 		for (int i = 0; i < rows; i++)
 			for (int j = 0; j < cols; j++)
