@@ -35,10 +35,11 @@ int main(int argc, char** argv) {
 	}
 
 	// BackgroundSubtractor viene usato per generare la foreground mask
-	int history=2000; // numero di frame usati per aggiornare il background
-	float varThreshold=1000; // indica la distanza di un pixel dal modello di background
-	bool bShadowDetection=true; // true se deve essere rilevata anche l'ombra degli oggetti
-	Ptr<BackgroundSubtractor> backGroundSubMOG2 = new BackgroundSubtractorMOG2(history,varThreshold,bShadowDetection);
+	int history = 100; // numero di frame usati per aggiornare il background
+	float varThreshold = 100; // indica la distanza di Mahalanobis di un pixel dal modello di background
+	bool bShadowDetection = true; // true se deve essere rilevata anche l'ombra degli oggetti
+	Ptr<BackgroundSubtractor> backGroundSubMOG2 = new BackgroundSubtractorMOG2(
+			history, varThreshold, bShadowDetection);
 
 	while ((char) keyboard != 'q') { // passa al frame successivo quando si preme q
 		if (!src.read(frame)) { // read ritorna il frame, in caso negativo ritorna false
