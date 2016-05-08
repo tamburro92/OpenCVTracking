@@ -7,6 +7,8 @@
 
 using namespace cv;
 using namespace std;
+using namespace matrixSimilarity;
+
 
 #define MINAREA 120
 
@@ -15,10 +17,8 @@ int main(int argc, char** argv) {
 	Mat frame;
 	Mat fgMaskMOG2, fgMaskKNN;
 	Mat out;
-	Mat kernelErosion = getStructuringElement(MORPH_RECT, Size(3, 3),
-			Point(-1, -1)); // kernel per l'erosione, MORPH_RECT indica che e' un rettangolo
-	Mat kernelDilatation = getStructuringElement(MORPH_RECT, Size(3, 3),
-			Point(-1, -1)); // kernel per la dilatazione, MORPH_RECT indica che e' un rettangolo
+	Mat kernelErosion = getStructuringElement(MORPH_ELLIPSE, Size(3, 3)); // kernel per l'erosione, MORPH_RECT indica che e' un rettangolo
+	Mat kernelDilatation = getStructuringElement(MORPH_ELLIPSE, Size(5, 5)); // kernel per la dilatazione, MORPH_RECT indica che e' un rettangolo
 
 	int keyboard;
 
@@ -38,6 +38,12 @@ int main(int argc, char** argv) {
 	int history = 100; // numero di frame usati per aggiornare il background
 	float varThreshold = 100; // indica la distanza di Mahalanobis di un pixel dal modello di background
 	bool bShadowDetection = true; // true se deve essere rilevata anche l'ombra degli oggetti
+
+	    /*learningRate The value between 0 and 1 that indicates how fast the background model is
+	    learnt. Negative parameter value makes the algorithm to use some automatically chosen learning
+	    rate. 0 means that the background model is not updated at all, 1 means that the background model
+	    is completely reinitialized from the last frame. */
+	float learningRate = -1; //tra 0 e 1; -1 indica che l'algoritmo lo autocalcola
 	Ptr<BackgroundSubtractor> backGroundSubMOG2 = new BackgroundSubtractorMOG2(
 			history, varThreshold, bShadowDetection);
 
@@ -48,9 +54,15 @@ int main(int argc, char** argv) {
 		}
 
 		//	GaussianBlur( frame, frame, Size( 3, 3 ), 0, 0 );
-		backGroundSubMOG2->operator ()(frame, fgMaskMOG2); // aggiorna il modello del background e calcola la foreground mask
+
+		backGroundSubMOG2->operator ()(frame, fgMaskMOG2, learningRate); // aggiorna il modello del background e calcola la foreground mask
+
 
 		imshow("FG Mask MOG 2", fgMaskMOG2);
+		//Threshold vado ad eliminare le ombre ed altri pixel...
+        threshold(fgMaskMOG2, fgMaskMOG2, 252, 255, 0); // Threshold Type 0: Binary
+		imshow("FG Mask MOG 2 Threshold", fgMaskMOG2);
+
 		erode(fgMaskMOG2, fgMaskMOG2, kernelErosion); //Applico Erosione
 		dilate(fgMaskMOG2, fgMaskMOG2, kernelDilatation); //Applico Dilatazione
 		imshow("FG Mask MOG 2 Filtered", fgMaskMOG2);
