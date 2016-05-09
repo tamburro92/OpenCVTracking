@@ -13,7 +13,8 @@ using std::vector;
 
 class Obj {
 private:
-	vector<Point> blob;
+	vector<Point> associatedBlob; // blob corrente associato all'oggetto
+	vector<Point> oldBlob; // blob che era associato all'oggetto precedentemente
 	int name;
 	int ghostFrame;
 public:
@@ -34,7 +35,7 @@ public:
 	void deassociateBlob();
 
 	/**
-	 * Incrementa il ghost frame
+	 * Incrementa il ghost frame di uno
 	 * Ritorna il valore del ghost frame dopo l'incremento
 	 */
 	int incremGhostFrame();
@@ -45,10 +46,20 @@ public:
 	 */
 	int resetGhostFrame();
 
+	/**
+	 * Restituisce true se il blob e' stato associato
+	 * Restituisce false in caso contrario
+	 */
 	bool isAssociated();
 
+	/**
+	 * Restituisce il valore del parametro ghostFrame
+	 */
 	int getGhostFrame();
 
+	/**
+	 * Restituisce il nome dell'oggetto
+	 */
 	int getName();
 };
 

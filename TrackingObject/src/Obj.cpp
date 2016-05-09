@@ -13,15 +13,16 @@ using std::vector;
 Obj::Obj(int name) :
 		name(name) {
 	ghostFrame = 0;
-	blob.clear();
+	associatedBlob.clear();
 }
 
 void Obj::associateBlob(vector<Point> b) {
-	blob = b;
+	oldBlob=associatedBlob; // si assegna il blob corrente al vecchio blob prima dell'aggiornamento
+	associatedBlob = b; // aggiornamento del blob corrente
 }
 
 void Obj::deassociateBlob(){
-	blob.clear();
+	associatedBlob.clear(); // viene eliminato il contenuto di associatedBlob
 }
 
 int Obj::incremGhostFrame() {
@@ -35,7 +36,7 @@ int Obj::resetGhostFrame() {
 }
 
 bool Obj::isAssociated(){
-	return blob.empty()==true;
+	return associatedBlob.empty()==false;
 }
 
 int Obj::getGhostFrame(){
