@@ -33,3 +33,15 @@ int Obj::resetGhostFrame() {
 	ghostFrame = 0;
 	return ghostFrame;
 }
+
+bool Obj::isAssociated(){
+	return blob.empty()==true;
+}
+
+int Obj::getGhostFrame(){
+	return ghostFrame;
+}
+
+int Obj::getName(){
+	return name;
+}

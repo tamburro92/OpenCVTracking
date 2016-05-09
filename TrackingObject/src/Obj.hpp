@@ -44,6 +44,12 @@ public:
 	 * Ritorna il valore del ghost frame a zero
 	 */
 	int resetGhostFrame();
+
+	bool isAssociated();
+
+	int getGhostFrame();
+
+	int getName();
 };
 
 #endif
