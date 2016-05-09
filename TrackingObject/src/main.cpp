@@ -69,7 +69,7 @@ int main(int argc, char** argv) {
 		vector<vector<Point> > contours;
 
 		//trova tutti i contorni dei BLOBS
-		// contours: immagine in output con i contorni rilevati, ogni contorno e' memorizzato in un vetore
+		// contours: immagine in output con i contorni rilevati, ogni contorno e' memorizzato in un vettore
 		// RETR_TREE: modalita' in cui vengono memorizzati i contorni
 		// CHAIN_APPROX_SIMPLE: comprime segmenti orizzontali, verticali e diagonali e lascia solo i loro punti finali
 		// Point(0, 0): eventuale offset

@@ -7,9 +7,7 @@ using namespace cv;
 using namespace std;
 using std::vector;
 
-MatrixSimilarity::MatrixSimilarity(int r, int c) {
-	rows = r;
-	cols = c;
+MatrixSimilarity::MatrixSimilarity(int r, int c) : rows(r), cols(c) {
 	matrix = new float*[rows];
 	for (int i = 0; i < rows; i++) {
 		matrix[i] = new float[cols];
@@ -114,5 +112,4 @@ ostream &operator<<(ostream &os, const MatrixSimilarity &matrix) {
 	}
 	return os;
 }
-
 
