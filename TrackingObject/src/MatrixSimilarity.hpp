@@ -1,12 +1,11 @@
 #ifndef MATRIXSIMILARITY_HPP_
 #define MATRIXSIMILARITY_HPP_
 
-#include <cfloat>
 #include <opencv2/core/core.hpp>
 #include <iostream>
 
 #define DMAX 3 //Distanza MAX Algoritmo
-#define MINVALUE -1000 //Valore minimo della matrice di similiraità
+#define MINVALUE -1000 //Valore minimo della matrice di similarita'
 
 class MatrixSimilarity {
 private:
@@ -77,7 +76,7 @@ public:
 
 	/**
 	 * Overload dell'operatore << usato per stampare l'oggetto matrix,
-	 * la funzione è standard per tutti gli overload <<
+	 * la funzione ï¿½ standard per tutti gli overload <<
 	 *
 	 * @param os
 	 * @param matrix
