@@ -5,9 +5,9 @@
 #include <iostream>
 #include "MatrixSimilarity.hpp"
 
-
 using namespace cv;
 using namespace std;
+
 
 #define MINAREA 120
 
