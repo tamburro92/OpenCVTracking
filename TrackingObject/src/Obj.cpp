@@ -16,7 +16,7 @@ Obj::Obj(int name) :
 	associatedBlob.clear();
 }
 
-void Obj::associateBlob(vector<Point> b) {
+void Obj::setAssociateBlob(vector<Point> b) {
 	oldBlob=associatedBlob; // si assegna il blob corrente al vecchio blob prima dell'aggiornamento
 	associatedBlob = b; // aggiornamento del blob corrente
 }
@@ -46,3 +46,15 @@ int Obj::getGhostFrame(){
 int Obj::getName(){
 	return name;
 }
+vector<Point> Obj::getOldBlob(){
+	return oldBlob;
+}
+
+	vector<Point> Obj::getAssociatedBlob(){
+		return associatedBlob;
+	}
+
+	void Obj::setOldBlob(vector<Point> b){
+		oldBlob=b;
+	}
+

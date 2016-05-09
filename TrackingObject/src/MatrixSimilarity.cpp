@@ -1,12 +1,14 @@
 #include "MatrixSimilarity.hpp"
 #include <opencv2/core/core.hpp>
 #include <iostream>
+#include "Obj.hpp"
 
 using namespace cv;
 using namespace std;
 using std::vector;
 
-MatrixSimilarity::MatrixSimilarity(int r, int c) : rows(r), cols(c) {
+MatrixSimilarity::MatrixSimilarity(int r, int c) :
+		rows(r), cols(c) {
 	matrix = new float*[rows];
 	for (int i = 0; i < rows; i++) {
 		matrix[i] = new float[cols];
@@ -39,13 +41,20 @@ bool MatrixSimilarity::deleteFromMatrix(int blob, int obj) {
 
 }
 
-void MatrixSimilarity::calculateMatrix(std::vector<Point2f> blobs,
-		std::vector<Point2f> objs) {
-	for (int i = 0; i < rows; i++)
-		for (int j = 0; j < cols; j++)
-			if (cv::norm(blobs[i] - objs[j]) < DMAX)
-				matrix[i][j] = 1 - cv::norm(blobs[i] - objs[j]) / DMAX;
+void MatrixSimilarity::calculateMatrix(vector<Obj>& oggetti,
+		vector<vector<Point>>& blobs) {
+	for (int i = 0; i < blobs.size(); i++) {
+		for (int j = 0; j < oggetti.size(); j++) {
+			Point2f cBlob = centerBlob(blobs[i]);
+			Point2f cObj = centerBlob(oggetti[j].getOldBlob());
+			if (cv::norm(cBlob - cObj) < DMAX)
+				matrix[i][j] = 1 - cv::norm(cBlob - cObj) / DMAX;
+			else
+				matrix[i][j] = 0;
 
+		}
+
+	}
 }
 
 std::vector<float> MatrixSimilarity::maxMatrix() {
@@ -97,6 +106,15 @@ void MatrixSimilarity::fillMatrixReset() {
 		for (int j = 0; j < cols; j++)
 			matrix[i][j] = MINVALUE;
 
+}
+
+Point2f centerBlob(vector<Point> blob) {
+	Point2f center;
+	vector<vector<Point> > contours_poly;
+	float radius;
+	approxPolyDP(Mat(blob), contours_poly, 3, true); //approssima il contorno in un polinomio, il 3 indica l'accuratezza dell'approssimazione, true indica che la linea e' chiusa
+	minEnclosingCircle((Mat) contours_poly, center, radius); // realizza un cerchio, vengono passati i punti, il centro, il raggio
+	return center;
 }
 
 ostream &operator<<(ostream &os, const MatrixSimilarity &matrix) {

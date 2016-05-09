@@ -27,7 +27,7 @@ public:
 	/**
 	 * Associa all'oggetto il blob b
 	 */
-	void associateBlob(vector<Point> b);
+	void setAssociateBlob(vector<Point> b);
 
 	/**
 	 * Deassocia il blob dal frame
@@ -61,6 +61,14 @@ public:
 	 * Restituisce il nome dell'oggetto
 	 */
 	int getName();
+
+	vector<Point> getOldBlob();
+
+	vector<Point> getAssociatedBlob();
+
+	void setOldBlob(vector<Point> b);
+
+
 };
 
 #endif

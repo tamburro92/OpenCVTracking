@@ -3,6 +3,11 @@
 
 #include <opencv2/core/core.hpp>
 #include <iostream>
+#include <vector>
+#include "Obj.hpp"
+
+using namespace std;
+using std::vector;
 
 #define DMAX 3 //Distanza MAX Algoritmo
 #define MINVALUE -1000 //Valore minimo della matrice di similarita'
@@ -47,7 +52,7 @@ public:
 	 * @param blobs Posizione dei blobs
 	 * @param objs  Posizione degli oggetti
 	 */
-	void calculateMatrix(std::vector<cv::Point2f> blobs, std::vector<cv::Point2f> objs);
+	void calculateMatrix(vector<Obj>& oggetti,vector<vector<Point>>& blobs);
 
 	/**
 	 * Calcola il massimo della matrice di similarita'
@@ -84,6 +89,9 @@ public:
 	 */
 	friend std::ostream &operator<<(std::ostream &os, const MatrixSimilarity &matrix);
 };
+
+Point2f centerBlob(vector<Point> blob);
+
 
 
 #endif

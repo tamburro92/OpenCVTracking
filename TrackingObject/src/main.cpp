@@ -4,15 +4,15 @@
 #include <opencv2/video/video.hpp>
 #include <iostream>
 #include "MatrixSimilarity.hpp"
+#include "Obj.hpp"
 
 using namespace cv;
 using namespace std;
-
-
 #define MINAREA 120
+void findDrawBlobs(InputOutputArray& image, OutputArrayOfArrays& contours);
+void tracking(vector<Obj>& oggetti, vector<vector<Point> >& blobs);
 
 int main(int argc, char** argv) {
-	RNG rng(12345); // generatore di un numero casuale
 	Mat frame;
 	Mat fgMaskMOG2, fgMaskKNN;
 	Mat out;
@@ -38,10 +38,10 @@ int main(int argc, char** argv) {
 	float varThreshold = 100; // indica la distanza di Mahalanobis di un pixel dal modello di background
 	bool bShadowDetection = true; // true se deve essere rilevata anche l'ombra degli oggetti
 
-	    /*learningRate The value between 0 and 1 that indicates how fast the background model is
-	    learnt. Negative parameter value makes the algorithm to use some automatically chosen learning
-	    rate. 0 means that the background model is not updated at all, 1 means that the background model
-	    is completely reinitialized from the last frame. */
+	/*learningRate The value between 0 and 1 that indicates how fast the background model is
+	 learnt. Negative parameter value makes the algorithm to use some automatically chosen learning
+	 rate. 0 means that the background model is not updated at all, 1 means that the background model
+	 is completely reinitialized from the last frame. */
 	float learningRate = -1; //tra 0 e 1; -1 indica che l'algoritmo lo autocalcola
 	Ptr<BackgroundSubtractor> backGroundSubMOG2 = new BackgroundSubtractorMOG2(
 			history, varThreshold, bShadowDetection);
@@ -56,80 +56,17 @@ int main(int argc, char** argv) {
 
 		backGroundSubMOG2->operator ()(frame, fgMaskMOG2, learningRate); // aggiorna il modello del background e calcola la foreground mask
 
-
 		imshow("FG Mask MOG 2", fgMaskMOG2);
 		//Threshold vado ad eliminare le ombre ed altri pixel...
-        threshold(fgMaskMOG2, fgMaskMOG2, 252, 255, 0); // Threshold Type 0: Binary
+		threshold(fgMaskMOG2, fgMaskMOG2, 252, 255, 0); // Threshold Type 0: Binary
 		imshow("FG Mask MOG 2 Threshold", fgMaskMOG2);
 
 		erode(fgMaskMOG2, fgMaskMOG2, kernelErosion); //Applico Erosione
 		dilate(fgMaskMOG2, fgMaskMOG2, kernelDilatation); //Applico Dilatazione
 		imshow("FG Mask MOG 2 Filtered", fgMaskMOG2);
 
-		vector<vector<Point> > contours;
-
-		//trova tutti i contorni dei BLOBS
-		// contours: immagine in output con i contorni rilevati, ogni contorno e' memorizzato in un vettore
-		// RETR_TREE: modalita' in cui vengono memorizzati i contorni
-		// CHAIN_APPROX_SIMPLE: comprime segmenti orizzontali, verticali e diagonali e lascia solo i loro punti finali
-		// Point(0, 0): eventuale offset
-		findContours(fgMaskMOG2, contours, RETR_TREE, CHAIN_APPROX_SIMPLE,
-				Point(0, 0));
-
 		Mat drawing = Mat::zeros(fgMaskMOG2.size(), CV_8UC3);
-
-		// approssima i controni a dei poligoni
-		vector<vector<Point> > contours_poly(contours.size());
-		vector<Point2f> center(contours.size());
-		vector<float> radius(contours.size());
-
-		for (size_t i = 0; i < contours.size(); i++) {
-			Scalar color = Scalar(rng.uniform(0, 255), rng.uniform(0, 255),
-					rng.uniform(0, 255));
-
-			//funzioni per calcolare il centro dei blob
-			approxPolyDP(Mat(contours[i]), contours_poly[i], 3, true); //approssima il contorno in un polinomio, il 3 indica l'accuratezza dell'approssimazione, true indica che la linea e' chiusa
-			minEnclosingCircle((Mat) contours_poly[i], center[i], radius[i]); // realizza un cerchio, vengono passati i punti, il centro, il raggio
-
-			cout << "Center : " << center[i] << endl;
-			cout << "Area : " << contourArea(contours[i]) << endl;
-
-			if (contourArea(contours[i]) > MINAREA) //FUNZIONE per calcolare l'area dei BLOBs
-				drawContours(drawing, contours, (int) i, color, 2, 8, noArray(),
-						0, Point());
-
-		}
-
-		MatrixSimilarity m(3, 3);
-		m.matrix[0][0] = 2;
-		m.matrix[0][1] = 1;
-		m.matrix[0][2] = 1.3;
-		m.matrix[1][0] = 4;
-		m.matrix[1][1] = 2.1;
-		m.matrix[1][2] = 1.1;
-		cout << "BLOB: " << m.remainBlobs().size() << endl;
-		cout << "Obj: " << m.remainObjects().size() << endl;
-		cout << m << endl;
-
-		std::vector<float> max = m.maxMatrix();
-		cout << max[0] << " " << max[1] << " " << max[2] << endl;
-		m.deleteFromMatrix(max[0], max[1]);
-		cout << "BLOB: " << m.remainBlobs().size() << endl;
-		cout << "Obj: " << m.remainObjects().size() << endl;
-		cout << "DOPO" << endl;
-		cout << m << endl;
-
-		max = m.maxMatrix();
-		cout << max[0] << " " << max[1] << " " << max[2] << endl;
-		m.deleteFromMatrix(max[0], max[1]);
-		cout << "BLOB: " << m.remainBlobs().size() << endl;
-		cout << "Obj: " << m.remainObjects().size() << endl;
-		cout << "DOPO" << endl;
-		cout << m << endl << endl;
-
-		cout << "BLOB: " << m.remainBlobs().size() << endl;
-		cout << "Obj: " << m.remainObjects().size() << endl;
-		//m.~MatrixSimilarity();
+		findDrawBlobs(fgMaskMOG2, drawing);
 
 		imshow("FG Mask MOG 2 blobs", drawing);
 		imshow("Frame", frame);
@@ -138,6 +75,54 @@ int main(int argc, char** argv) {
 		keyboard = waitKey(30);
 
 	}
+
+}
+
+void findDrawBlobs(InputOutputArray& image, OutputArrayOfArrays& drawing) {
+	RNG rng(12345); // generatore di un numero casuale
+	vector<vector<Point> > contours;
+	vector<vector<Point> > contours_poly(contours.size());
+	vector<Point2f> center(contours.size());
+	vector<float> radius(contours.size());
+
+	//trova tutti i contorni dei BLOBS
+	// contours: immagine in output con i contorni rilevati, ogni contorno e' memorizzato in un vettore
+	// RETR_TREE: modalita' in cui vengono memorizzati i contorni
+	// CHAIN_APPROX_SIMPLE: comprime segmenti orizzontali, verticali e diagonali e lascia solo i loro punti finali
+	// Point(0, 0): eventuale offset
+	findContours(image, contours, RETR_TREE, CHAIN_APPROX_SIMPLE, Point(0, 0));
+
+	// approssima i controni a dei poligoni
+	for (size_t i = 0; i < contours.size(); i++) {
+		Scalar color = Scalar(rng.uniform(0, 255), rng.uniform(0, 255),
+				rng.uniform(0, 255));
+
+		//funzioni per calcolare il centro dei blob
+		approxPolyDP(Mat(contours[i]), contours_poly[i], 3, true); //approssima il contorno in un polinomio, il 3 indica l'accuratezza dell'approssimazione, true indica che la linea e' chiusa
+		minEnclosingCircle((Mat) contours_poly[i], center[i], radius[i]); // realizza un cerchio, vengono passati i punti, il centro, il raggio
+
+		cout << "Center : " << center[i] << endl;
+		cout << "Area : " << contourArea(contours[i]) << endl;
+
+		if (contourArea(contours[i]) > MINAREA) //FUNZIONE per calcolare l'area dei BLOBs
+			drawContours(drawing, contours, (int) i, color, 2, 8, noArray(), 0,
+					Point());
+
+	}
+}
+void tracking(vector<Obj>& oggetti, vector<vector<Point> >& blobs) {
+	if (oggetti.empty()) { //se gli oggetti sono vuoti inizializzali a blobs
+		for (int i = 0; i < blobs.size(); i++) {
+			Obj obj(i);
+			obj.setOldBlob(blobs[i]);
+			oggetti.push_back(obj);
+		}
+		return; //ragionare se ci vuole ci vuole il return
+	}
+
+	MatrixSimilarity m(blobs.size(), oggetti.size());
+	m.calculateMatrix(oggetti, blobs);
+
 
 }
 
