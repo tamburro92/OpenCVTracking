@@ -14,6 +14,7 @@ Obj::Obj(int name) :
 		name(name) {
 	ghostFrame = 0;
 	blob.clear();
+	int a=0;
 }
 
 void Obj::associateBlob(vector<Point> b) {

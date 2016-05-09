@@ -14,6 +14,7 @@ using std::vector;
 class Obj {
 private:
 	vector<Point> blob;
+	int a=0;
 	int name;
 	int ghostFrame;
 public:
