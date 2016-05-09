@@ -16,12 +16,13 @@ Obj::Obj(int name) :
 	associatedBlob.clear();
 }
 
-void Obj::setAssociateBlob(vector<Point> b) {
+void Obj::associateBlob(vector<Point> b) {
 	oldBlob=associatedBlob; // si assegna il blob corrente al vecchio blob prima dell'aggiornamento
 	associatedBlob = b; // aggiornamento del blob corrente
 }
 
 void Obj::deassociateBlob(){
+	oldBlob=associatedBlob; //mantengo come ultimo blob il più recente
 	associatedBlob.clear(); // viene eliminato il contenuto di associatedBlob
 }
 

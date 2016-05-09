@@ -27,7 +27,7 @@ public:
 	/**
 	 * Associa all'oggetto il blob b
 	 */
-	void setAssociateBlob(vector<Point> b);
+	void associateBlob(vector<Point> b);
 
 	/**
 	 * Deassocia il blob dal frame
