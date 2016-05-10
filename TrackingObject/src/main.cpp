@@ -8,7 +8,7 @@
 
 using namespace cv;
 using namespace std;
-#define MINAREA 120
+#define MINAREA 240
 void findDrawBlobs(InputOutputArray& image, InputOutputArray& drawing, vector<vector<Point> >& blobs) ;
 void tracking(vector<Obj>& oggetti, vector<vector<Point> >& blobs);
 
@@ -69,8 +69,11 @@ int main(int argc, char** argv) {
 		vector<vector<Point> > blobs;
 		vector<Obj> oggetti;
 		findDrawBlobs(fgMaskMOG2, drawing, blobs);
-
 		tracking(oggetti,blobs);
+
+		for(auto o:oggetti){
+			cout<<o.getName()<<" "<<o.getPositions()<<endl;
+		}
 
 		imshow("FG Mask MOG 2 blobs", drawing);
 		imshow("Frame", frame);
@@ -105,14 +108,14 @@ void findDrawBlobs(InputOutputArray& image, InputOutputArray& drawing, vector<ve
 		approxPolyDP(Mat(blobs[i]), contours_poly, 3, true); //approssima il contorno in un polinomio, il 3 indica l'accuratezza dell'approssimazione, true indica che la linea e' chiusa
 		minEnclosingCircle((Mat) contours_poly, center, radius); // realizza un cerchio, vengono passati i punti, il centro, il raggio
 
-		if (contourArea(blobs[i]) > MINAREA){} //FUNZIONE per calcolare l'area dei BLOBs
+		if (contourArea(blobs[i]) > MINAREA) //FUNZIONE per calcolare l'area dei BLOBs
 			drawContours(drawing, blobs, (int) i, color, 2, 8, noArray(), 0,
 					Point());
 
 	}
 }
 void tracking(vector<Obj>& oggetti, vector<vector<Point> >& blobs) {
-	float THRESHOLD=3;
+	float THRESHOLD=0.7;
 	int GHOST_FRAME=5;
 	if (oggetti.empty()) { //se gli oggetti sono vuoti inizializzali a blobs
 		for (int i = 0; i < blobs.size(); i++) {

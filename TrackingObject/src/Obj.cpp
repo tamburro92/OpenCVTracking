@@ -5,6 +5,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/video/video.hpp>
+#include "MatrixSimilarity.hpp"
 
 using namespace cv;
 using namespace std;
@@ -19,10 +20,11 @@ Obj::Obj(int name) :
 void Obj::associateBlob(vector<Point> b) {
 	oldBlob = associatedBlob; // si assegna il blob corrente al vecchio blob prima dell'aggiornamento
 	associatedBlob = b; // aggiornamento del blob corrente
+	positions.push_back(centerBlob(b));
 }
 
 void Obj::deassociateBlob() {
-	oldBlob = associatedBlob; //mantengo come ultimo blob il più recente
+	oldBlob = associatedBlob; //mantengo come ultimo blob il piï¿½ recente
 	associatedBlob.clear(); // viene eliminato il contenuto di associatedBlob
 }
 

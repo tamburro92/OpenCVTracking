@@ -15,6 +15,7 @@ class Obj {
 private:
 	vector<Point> associatedBlob; // blob corrente associato all'oggetto
 	vector<Point> oldBlob; // blob che era associato all'oggetto precedentemente
+	vector<Point> positions;
 	int name;
 	int ghostFrame;
 	bool toDelete;
@@ -72,6 +73,10 @@ public:
 	void setToDelete(bool b);
 
 	bool getToDelete();
+
+	vector<Point> getPositions(){
+		return positions;
+	}
 
 };
 

@@ -9,7 +9,7 @@
 using namespace std;
 using std::vector;
 
-#define DMAX 0.7 //Distanza MAX Algoritmo
+#define DMAX 20 //Distanza MAX Algoritmo
 #define MINVALUE -1000 //Valore minimo della matrice di similarita'
 
 class MatrixSimilarity {
