@@ -9,7 +9,7 @@
 using namespace cv;
 using namespace std;
 #define MINAREA 120
-void findDrawBlobs(InputOutputArray& image, InputOutputArray& contours);
+void findDrawBlobs(InputOutputArray& image, InputOutputArray& drawing, vector<vector<Point> >& blobs) ;
 void tracking(vector<Obj>& oggetti, vector<vector<Point> >& blobs);
 
 int main(int argc, char** argv) {
@@ -66,8 +66,12 @@ int main(int argc, char** argv) {
 		imshow("FG Mask MOG 2 Filtered", fgMaskMOG2);
 
 		Mat drawing = Mat::zeros(fgMaskMOG2.size(), CV_8UC3);
+		vector<vector<Point> > blobs;
+		vector<Obj> oggetti;
+		findDrawBlobs(fgMaskMOG2, drawing, blobs);
 
-		findDrawBlobs(fgMaskMOG2, drawing);
+		tracking(oggetti,blobs);
+
 		imshow("FG Mask MOG 2 blobs", drawing);
 		imshow("Frame", frame);
 		waitKey();
@@ -78,9 +82,8 @@ int main(int argc, char** argv) {
 
 }
 
-void findDrawBlobs(InputOutputArray& image, InputOutputArray& drawing) {
+void findDrawBlobs(InputOutputArray& image, InputOutputArray& drawing, vector<vector<Point> >& blobs) {
 	RNG rng(12345); // generatore di un numero casuale
-	vector<vector<Point> > contours;
 	vector<Point> contours_poly;
 	Point2f center;
 	float radius;
@@ -92,21 +95,21 @@ void findDrawBlobs(InputOutputArray& image, InputOutputArray& drawing) {
 	// RETR_TREE: modalita' in cui vengono memorizzati i contorni
 	// CHAIN_APPROX_SIMPLE: comprime segmenti orizzontali, verticali e diagonali e lascia solo i loro punti finali
 	// Point(0, 0): eventuale offset
-	findContours(image, contours, RETR_TREE, CHAIN_APPROX_SIMPLE, Point(0, 0));
+	findContours(image, blobs, RETR_TREE, CHAIN_APPROX_SIMPLE, Point(0, 0));
 	// approssima i controni a dei poligoni
-	for (size_t i = 0; i < contours.size(); i++) {
+	for (size_t i = 0; i < blobs.size(); i++) {
 		Scalar color = Scalar(rng.uniform(0, 255), rng.uniform(0, 255),
 				rng.uniform(0, 255));
 
 		//funzioni per calcolare il centro dei blob
-		approxPolyDP(Mat(contours[i]), contours_poly, 3, true); //approssima il contorno in un polinomio, il 3 indica l'accuratezza dell'approssimazione, true indica che la linea e' chiusa
+		approxPolyDP(Mat(blobs[i]), contours_poly, 3, true); //approssima il contorno in un polinomio, il 3 indica l'accuratezza dell'approssimazione, true indica che la linea e' chiusa
 		minEnclosingCircle((Mat) contours_poly, center, radius); // realizza un cerchio, vengono passati i punti, il centro, il raggio
 
 		cout << "Center : " << center << endl;
-		cout << "Area : " << contourArea(contours[i]) << endl;
+		cout << "Area : " << contourArea(blobs[i]) << endl;
 
-		if (contourArea(contours[i]) > MINAREA){} //FUNZIONE per calcolare l'area dei BLOBs
-			drawContours(drawing, contours, (int) i, color, 2, 8, noArray(), 0,
+		if (contourArea(blobs[i]) > MINAREA){} //FUNZIONE per calcolare l'area dei BLOBs
+			drawContours(drawing, blobs, (int) i, color, 2, 8, noArray(), 0,
 					Point());
 
 	}
@@ -148,5 +151,17 @@ void tracking(vector<Obj>& oggetti, vector<vector<Point> >& blobs) {
 		}
 	}
 	oggetti=temp;
+	vector<int> indexRemainBlob=m.remainBlobs();
+	int name;
+	if(oggetti.empty()){
+		name=0;
+	}else{
+		name=oggetti.back().getName();
+	}
+	for(auto indexBlob:indexRemainBlob){
+		Obj obj(name++);
+		obj.associateBlob(blobs[indexBlob]);
+		oggetti.push_back(obj);
+	}
 }
 
