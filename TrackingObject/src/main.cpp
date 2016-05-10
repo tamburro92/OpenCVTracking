@@ -1,3 +1,6 @@
+#define MAIN //utilizzata per selezionare se usare il codicediTEST o il MAIN;=MAIN,TEST_MATRIX
+#ifdef MAIN
+
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -124,6 +127,7 @@ void tracking(vector<Obj>& oggetti, vector<vector<Point> >& blobs) {
 			obj.setOldBlob(blobs[i]);
 			oggetti.push_back(obj);
 		}
+		return;
 	}
 
 	for(auto o:oggetti) //ad inizio iterazione deassocio tutto
@@ -167,3 +171,4 @@ void tracking(vector<Obj>& oggetti, vector<vector<Point> >& blobs) {
 	}
 }
 
+#endif
