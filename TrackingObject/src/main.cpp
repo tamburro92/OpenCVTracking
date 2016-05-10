@@ -85,6 +85,8 @@ void findDrawBlobs(InputOutputArray& image, InputOutputArray& drawing) {
 	Point2f center;
 	float radius;
 
+
+
 	//trova tutti i contorni dei BLOBS
 	// contours: immagine in output con i contorni rilevati, ogni contorno e' memorizzato in un vettore
 	// RETR_TREE: modalita' in cui vengono memorizzati i contorni
@@ -104,7 +106,7 @@ void findDrawBlobs(InputOutputArray& image, InputOutputArray& drawing) {
 		cout << "Area : " << contourArea(contours[i]) << endl;
 
 		if (contourArea(contours[i]) > MINAREA){} //FUNZIONE per calcolare l'area dei BLOBs
-			drawContours(drawing, contours[i], (int) i, color, 2, 8, noArray(), 0,
+			drawContours(drawing, contours, (int) i, color, 2, 8, noArray(), 0,
 					Point());
 
 	}
