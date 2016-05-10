@@ -105,9 +105,6 @@ void findDrawBlobs(InputOutputArray& image, InputOutputArray& drawing, vector<ve
 		approxPolyDP(Mat(blobs[i]), contours_poly, 3, true); //approssima il contorno in un polinomio, il 3 indica l'accuratezza dell'approssimazione, true indica che la linea e' chiusa
 		minEnclosingCircle((Mat) contours_poly, center, radius); // realizza un cerchio, vengono passati i punti, il centro, il raggio
 
-		cout << "Center : " << center << endl;
-		cout << "Area : " << contourArea(blobs[i]) << endl;
-
 		if (contourArea(blobs[i]) > MINAREA){} //FUNZIONE per calcolare l'area dei BLOBs
 			drawContours(drawing, blobs, (int) i, color, 2, 8, noArray(), 0,
 					Point());
@@ -121,6 +118,7 @@ void tracking(vector<Obj>& oggetti, vector<vector<Point> >& blobs) {
 		for (int i = 0; i < blobs.size(); i++) {
 			Obj obj(i);
 			obj.associateBlob(blobs[i]);
+			obj.setOldBlob(blobs[i]);
 			oggetti.push_back(obj);
 		}
 	}
@@ -136,6 +134,7 @@ void tracking(vector<Obj>& oggetti, vector<vector<Point> >& blobs) {
 	   m.deleteFromMatrix(max[0],max[1]);  //cancella
 	   max=m.maxMatrix();
 	}
+
 	vector<int> indexRemainObj=m.remainObjects();
 	vector<int> indexToRemove;
 	for(auto i:indexRemainObj){

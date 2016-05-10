@@ -47,10 +47,11 @@ void MatrixSimilarity::calculateMatrix(vector<Obj>& oggetti,
 		for (int j = 0; j < oggetti.size(); j++) {
 			Point2f cBlob = centerBlob(blobs[i]);
 			Point2f cObj = centerBlob(oggetti[j].getOldBlob());
-			if (cv::norm(cBlob - cObj) < DMAX)
+			if (cv::norm(cBlob - cObj) < DMAX) {
 				matrix[i][j] = 1 - cv::norm(cBlob - cObj) / DMAX;
-			else
+			} else {
 				matrix[i][j] = 0;
+			}
 
 		}
 
@@ -110,7 +111,7 @@ void MatrixSimilarity::fillMatrixReset() {
 
 Point2f centerBlob(vector<Point> blob) {
 	Point2f center;
-	vector<vector<Point> > contours_poly;
+	vector<Point> contours_poly;
 	float radius;
 	approxPolyDP(Mat(blob), contours_poly, 3, true); //approssima il contorno in un polinomio, il 3 indica l'accuratezza dell'approssimazione, true indica che la linea e' chiusa
 	minEnclosingCircle((Mat) contours_poly, center, radius); // realizza un cerchio, vengono passati i punti, il centro, il raggio
