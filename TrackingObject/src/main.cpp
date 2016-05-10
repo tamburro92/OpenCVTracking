@@ -112,7 +112,8 @@ void findDrawBlobs(InputOutputArray& image, InputOutputArray& drawing) {
 	}
 }
 void tracking(vector<Obj>& oggetti, vector<vector<Point> >& blobs) {
-	float TRHESHOLD=3;
+	float THRESHOLD=3;
+	int GHOST_FRAME=5;
 	if (oggetti.empty()) { //se gli oggetti sono vuoti inizializzali a blobs
 		for (int i = 0; i < blobs.size(); i++) {
 			Obj obj(i);
@@ -127,16 +128,25 @@ void tracking(vector<Obj>& oggetti, vector<vector<Point> >& blobs) {
 	MatrixSimilarity m(blobs.size(), oggetti.size());
 	m.calculateMatrix(oggetti, blobs);
 	vector<float> max=m.maxMatrix();
-	while(max[2]>TRHESHOLD&&max[0]!=-1){
-	   oggetti[max[2]].associateBlob(blobs[max[1]]);//associa max[2]
+	while(max[2]>THRESHOLD){
+	   oggetti[max[1]].associateBlob(blobs[max[0]]);
 	   m.deleteFromMatrix(max[0],max[1]);  //cancella
 	   max=m.maxMatrix();
 	}
 	vector<int> indexRemainObj=m.remainObjects();
+	vector<int> indexToRemove;
 	for(auto i:indexRemainObj){
 		oggetti[i].incremGhostFrame();
-
-		//oggetti.erase(i); //vedere come cancellare l'elemento all'interno del for
+		if(oggetti[i].getGhostFrame()>GHOST_FRAME){
+			oggetti[i].setToDelete(true);
+		}
 	}
+	vector<Obj> temp;
+	for(auto obj:oggetti){
+		if(obj.getToDelete()==false){
+			temp.push_back(obj);
+		}
+	}
+	oggetti=temp;
 }
 

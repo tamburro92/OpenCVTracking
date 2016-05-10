@@ -52,7 +52,7 @@ public:
 	 * @param blobs Posizione dei blobs
 	 * @param objs  Posizione degli oggetti
 	 */
-	void calculateMatrix(vector<Obj>& oggetti,vector<vector<Point>>& blobs);
+	void calculateMatrix(vector<Obj>& oggetti,vector<vector<Point> >& blobs);
 
 	/**
 	 * Calcola il massimo della matrice di similarita'

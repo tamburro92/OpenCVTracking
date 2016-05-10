@@ -42,7 +42,7 @@ bool MatrixSimilarity::deleteFromMatrix(int blob, int obj) {
 }
 
 void MatrixSimilarity::calculateMatrix(vector<Obj>& oggetti,
-		vector<vector<Point>>& blobs) {
+		vector<vector<Point> >& blobs) {
 	for (int i = 0; i < blobs.size(); i++) {
 		for (int j = 0; j < oggetti.size(); j++) {
 			Point2f cBlob = centerBlob(blobs[i]);
