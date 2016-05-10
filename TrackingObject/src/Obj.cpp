@@ -11,18 +11,18 @@ using namespace std;
 using std::vector;
 
 Obj::Obj(int name) :
-		name(name) {
+		name(name), toDelete(false) {
 	ghostFrame = 0;
 	associatedBlob.clear();
 }
 
 void Obj::associateBlob(vector<Point> b) {
-	oldBlob=associatedBlob; // si assegna il blob corrente al vecchio blob prima dell'aggiornamento
+	oldBlob = associatedBlob; // si assegna il blob corrente al vecchio blob prima dell'aggiornamento
 	associatedBlob = b; // aggiornamento del blob corrente
 }
 
-void Obj::deassociateBlob(){
-	oldBlob=associatedBlob; //mantengo come ultimo blob il più recente
+void Obj::deassociateBlob() {
+	oldBlob = associatedBlob; //mantengo come ultimo blob il più recente
 	associatedBlob.clear(); // viene eliminato il contenuto di associatedBlob
 }
 
@@ -36,26 +36,32 @@ int Obj::resetGhostFrame() {
 	return ghostFrame;
 }
 
-bool Obj::isAssociated(){
-	return associatedBlob.empty()==false;
+bool Obj::isAssociated() {
+	return associatedBlob.empty() == false;
 }
 
-int Obj::getGhostFrame(){
+int Obj::getGhostFrame() {
 	return ghostFrame;
 }
 
-int Obj::getName(){
+int Obj::getName() {
 	return name;
 }
-vector<Point> Obj::getOldBlob(){
+vector<Point> Obj::getOldBlob() {
 	return oldBlob;
 }
 
-	vector<Point> Obj::getAssociatedBlob(){
-		return associatedBlob;
-	}
+vector<Point> Obj::getAssociatedBlob() {
+	return associatedBlob;
+}
 
-	void Obj::setOldBlob(vector<Point> b){
-		oldBlob=b;
-	}
+void Obj::setOldBlob(vector<Point> b) {
+	oldBlob = b;
+}
+void Obj::setToDelete(bool b) {
+	toDelete = b;
+}
+bool Obj::getToDelete() {
+	return toDelete;
+}
 

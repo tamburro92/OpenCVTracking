@@ -17,6 +17,7 @@ private:
 	vector<Point> oldBlob; // blob che era associato all'oggetto precedentemente
 	int name;
 	int ghostFrame;
+	bool toDelete;
 public:
 	/**
 	 * Costruttore
@@ -68,6 +69,9 @@ public:
 
 	void setOldBlob(vector<Point> b);
 
+	void setToDelete(bool b);
+
+	bool getToDelete();
 
 };
 
