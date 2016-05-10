@@ -120,6 +120,7 @@ void tracking(vector<Obj>& oggetti, vector<vector<Point> >& blobs) {
 			oggetti.push_back(obj);
 		}
 	}
+
 	for(auto o:oggetti) //ad inizio iterazione deassocio tutto
 		o.deassociateBlob();
 
