@@ -132,6 +132,7 @@ void tracking(vector<Obj>& oggetti, vector<vector<Point> >& blobs) {
 	vector<int> indexRemainObj=m.remainObjects();
 	for(auto i:indexRemainObj){
 		oggetti[i].incremGhostFrame();
+
 		//oggetti.erase(i); //vedere come cancellare l'elemento all'interno del for
 	}
 }
