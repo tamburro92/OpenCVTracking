@@ -11,7 +11,7 @@
 
 using namespace cv;
 using namespace std;
-#define MINAREA 240
+#define MINAREA 500
 void findDrawBlobs(InputOutputArray& image, InputOutputArray& drawing, vector<vector<Point> >& blobs) ;
 void tracking(vector<Obj>& oggetti, vector<vector<Point> >& blobs);
 
@@ -19,12 +19,14 @@ int main(int argc, char** argv) {
 	Mat frame;
 	Mat fgMaskMOG2, fgMaskKNN;
 	Mat out;
-	Mat kernelErosion = getStructuringElement(MORPH_ELLIPSE, Size(3, 3)); // kernel per l'erosione, MORPH_RECT indica che e' un rettangolo
-	Mat kernelDilatation = getStructuringElement(MORPH_ELLIPSE, Size(5, 5)); // kernel per la dilatazione, MORPH_RECT indica che e' un rettangolo
+	vector<Obj> oggetti;
+	Mat kernelDilate = getStructuringElement(MORPH_RECT, Size(5, 5)); // kernel per la dilatazione, MORPH_RECT indica che e' un rettangolo
+	Mat kernelErode = getStructuringElement(MORPH_RECT, Size(3, 3)); // kernel per l'erosione, MORPH_RECT indica che e' un rettangolo
+
 
 	int keyboard;
 
-	VideoCapture src("video.avi"); // si suppone che il video stia nella cartella del progeto
+	VideoCapture src("atrium.avi"); // si suppone che il video stia nella cartella del progeto
 
 	namedWindow("Frame");
 	namedWindow("FG Mask MOG 2");
@@ -64,13 +66,13 @@ int main(int argc, char** argv) {
 		threshold(fgMaskMOG2, fgMaskMOG2, 252, 255, 0); // Threshold Type 0: Binary
 		imshow("FG Mask MOG 2 Threshold", fgMaskMOG2);
 
-		erode(fgMaskMOG2, fgMaskMOG2, kernelErosion); //Applico Erosione
-		dilate(fgMaskMOG2, fgMaskMOG2, kernelDilatation); //Applico Dilatazione
+		dilate(fgMaskMOG2, fgMaskMOG2, kernelDilate); //Applico Dilatazione
+		erode(fgMaskMOG2, fgMaskMOG2, kernelErode); //Applico Erosione
+
 		imshow("FG Mask MOG 2 Filtered", fgMaskMOG2);
 
 		Mat drawing = Mat::zeros(fgMaskMOG2.size(), CV_8UC3);
 		vector<vector<Point> > blobs;
-		vector<Obj> oggetti;
 		findDrawBlobs(fgMaskMOG2, drawing, blobs);
 		tracking(oggetti,blobs);
 
@@ -118,7 +120,9 @@ void findDrawBlobs(InputOutputArray& image, InputOutputArray& drawing, vector<ve
 	}
 }
 void tracking(vector<Obj>& oggetti, vector<vector<Point> >& blobs) {
-	float THRESHOLD=0.7;
+	   cout<<"CALLED"<<endl;
+
+	float THRESHOLD=0.4;
 	int GHOST_FRAME=5;
 	if (oggetti.empty()) { //se gli oggetti sono vuoti inizializzali a blobs
 		for (int i = 0; i < blobs.size(); i++) {
@@ -137,10 +141,13 @@ void tracking(vector<Obj>& oggetti, vector<vector<Point> >& blobs) {
 	m.calculateMatrix(oggetti, blobs);
 	vector<float> max=m.maxMatrix();
 	while(max[2]>THRESHOLD){
+	   cout<<"MAX1 "<<max[2]<<endl;
 	   oggetti[max[1]].associateBlob(blobs[max[0]]);
 	   m.deleteFromMatrix(max[0],max[1]);  //cancella
 	   max=m.maxMatrix();
 	}
+	cout<<"MAX2 "<<max[2]<<endl;
+
 
 	vector<int> indexRemainObj=m.remainObjects();
 	vector<int> indexToRemove;
