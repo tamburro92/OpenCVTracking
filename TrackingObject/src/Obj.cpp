@@ -15,6 +15,10 @@ Obj::Obj(int name) :
 		name(name), toDelete(false) {
 	ghostFrame = 0;
 	associatedBlob.clear();
+	RNG rng(rand());
+	color.push_back(rng.uniform(0, 255));
+	color.push_back(rng.uniform(0, 255));
+	color.push_back(rng.uniform(0, 255));
 }
 
 void Obj::associateBlob(vector<Point> b) {
@@ -65,5 +69,13 @@ void Obj::setToDelete(bool b) {
 }
 bool Obj::getToDelete() {
 	return toDelete;
+}
+
+vector<Point> Obj::getPositions(){
+	return positions;
+}
+
+vector<int> Obj::getColor(){
+	return color;
 }
 

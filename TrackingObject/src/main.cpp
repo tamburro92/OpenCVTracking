@@ -26,7 +26,8 @@ int main(int argc, char** argv) {
 
 	int keyboard;
 
-	VideoCapture src("atrium.avi"); // si suppone che il video stia nella cartella del progeto
+	VideoCapture src("atrium.avi"); // si suppone che il video stia nella cartella del progetto
+	//VideoCapture src("video.avi"); // si suppone che il video stia nella cartella del progetto
 
 	namedWindow("Frame");
 	namedWindow("FG Mask MOG 2");
@@ -76,9 +77,11 @@ int main(int argc, char** argv) {
 		findDrawBlobs(fgMaskMOG2, drawing, blobs);
 		tracking(oggetti,blobs);
 
-		//for(auto o:oggetti){
+		for(auto o:oggetti){
 			//cout<<o.getName()<<" "<<o.getPositions()<<endl;
-		//}
+			for(int i=0;i<o.getPositions().size();i++){
+			circle(drawing,Point(o.getPositions()[i].x,o.getPositions()[i].y),1,Scalar(o.getColor()[0],o.getColor()[1],o.getColor()[2]),1,8);}
+		}
 
 		imshow("FG Mask MOG 2 blobs", drawing);
 		imshow("Frame", frame);
@@ -125,7 +128,7 @@ void tracking(vector<Obj>& oggetti, vector<vector<Point> >& blobs) {
 	   //cout<<"CALLED"<<endl;
 
 	float THRESHOLD=0.4;
-	int GHOST_FRAME=1;
+	int GHOST_FRAME=5;
 	if (oggetti.empty()) { //se gli oggetti sono vuoti inizializzali a blobs
 		for (int i = 0; i < blobs.size(); i++) {
 			Obj obj(i);

@@ -9,7 +9,7 @@
 using namespace std;
 using std::vector;
 
-#define DMAX 20 //Distanza MAX Algoritmo
+#define DMAX 100 //Distanza MAX Algoritmo
 #define MINVALUE -1000 //Valore minimo della matrice di similarita'
 
 class MatrixSimilarity {
@@ -81,7 +81,7 @@ public:
 
 	/**
 	 * Overload dell'operatore << usato per stampare l'oggetto matrix,
-	 * la funzione � standard per tutti gli overload <<
+	 * la funzione e' standard per tutti gli overload <<
 	 *
 	 * @param os
 	 * @param matrix
