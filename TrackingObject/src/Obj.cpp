@@ -18,13 +18,13 @@ Obj::Obj(int name) :
 }
 
 void Obj::associateBlob(vector<Point> b) {
-	oldBlob = associatedBlob; // si assegna il blob corrente al vecchio blob prima dell'aggiornamento
+	oldBlob = b; // si assegna il blob corrente al vecchio blob prima dell'aggiornamento
 	associatedBlob = b; // aggiornamento del blob corrente
 	positions.push_back(centerBlob(b));
 }
 
 void Obj::deassociateBlob() {
-	oldBlob = associatedBlob; //mantengo come ultimo blob il pi� recente
+	//oldBlob = associatedBlob; //mantengo come ultimo blob il piu' recente
 	associatedBlob.clear(); // viene eliminato il contenuto di associatedBlob
 }
 

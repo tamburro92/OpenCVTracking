@@ -76,9 +76,9 @@ int main(int argc, char** argv) {
 		findDrawBlobs(fgMaskMOG2, drawing, blobs);
 		tracking(oggetti,blobs);
 
-		for(auto o:oggetti){
-			cout<<o.getName()<<" "<<o.getPositions()<<endl;
-		}
+		//for(auto o:oggetti){
+			//cout<<o.getName()<<" "<<o.getPositions()<<endl;
+		//}
 
 		imshow("FG Mask MOG 2 blobs", drawing);
 		imshow("Frame", frame);
@@ -95,7 +95,7 @@ void findDrawBlobs(InputOutputArray& image, InputOutputArray& drawing, vector<ve
 	vector<Point> contours_poly;
 	Point2f center;
 	float radius;
-
+	vector<vector<Point> > blobtemp;
 
 
 	//trova tutti i contorni dei BLOBS
@@ -103,27 +103,29 @@ void findDrawBlobs(InputOutputArray& image, InputOutputArray& drawing, vector<ve
 	// RETR_TREE: modalita' in cui vengono memorizzati i contorni
 	// CHAIN_APPROX_SIMPLE: comprime segmenti orizzontali, verticali e diagonali e lascia solo i loro punti finali
 	// Point(0, 0): eventuale offset
-	findContours(image, blobs, RETR_TREE, CHAIN_APPROX_SIMPLE, Point(0, 0));
+	findContours(image, blobtemp, RETR_TREE, CHAIN_APPROX_SIMPLE, Point(0, 0));
 	// approssima i controni a dei poligoni
-	for (size_t i = 0; i < blobs.size(); i++) {
+	for (size_t i = 0; i < blobtemp.size(); i++) {
 		Scalar color = Scalar(rng.uniform(0, 255), rng.uniform(0, 255),
 				rng.uniform(0, 255));
 
 		//funzioni per calcolare il centro dei blob
-		approxPolyDP(Mat(blobs[i]), contours_poly, 3, true); //approssima il contorno in un polinomio, il 3 indica l'accuratezza dell'approssimazione, true indica che la linea e' chiusa
+		approxPolyDP(Mat(blobtemp[i]), contours_poly, 3, true); //approssima il contorno in un polinomio, il 3 indica l'accuratezza dell'approssimazione, true indica che la linea e' chiusa
 		minEnclosingCircle((Mat) contours_poly, center, radius); // realizza un cerchio, vengono passati i punti, il centro, il raggio
 
-		if (contourArea(blobs[i]) > MINAREA) //FUNZIONE per calcolare l'area dei BLOBs
-			drawContours(drawing, blobs, (int) i, color, 2, 8, noArray(), 0,
+		if (contourArea(blobtemp[i]) > MINAREA){ //FUNZIONE per calcolare l'area dei BLOBs
+			drawContours(drawing, blobtemp, (int) i, color, 2, 8, noArray(), 0,
 					Point());
+			blobs.push_back(blobtemp[i]); // vengono aggiunti solo i blob che rispettano il vincolo su MINAREA
+		}
 
 	}
 }
 void tracking(vector<Obj>& oggetti, vector<vector<Point> >& blobs) {
-	   cout<<"CALLED"<<endl;
+	   //cout<<"CALLED"<<endl;
 
 	float THRESHOLD=0.4;
-	int GHOST_FRAME=5;
+	int GHOST_FRAME=1;
 	if (oggetti.empty()) { //se gli oggetti sono vuoti inizializzali a blobs
 		for (int i = 0; i < blobs.size(); i++) {
 			Obj obj(i);
@@ -136,17 +138,17 @@ void tracking(vector<Obj>& oggetti, vector<vector<Point> >& blobs) {
 
 	for(auto o:oggetti) //ad inizio iterazione deassocio tutto
 		o.deassociateBlob();
-
+	cout<<"blobs.size :"<<blobs.size()<<endl;
 	MatrixSimilarity m(blobs.size(), oggetti.size());
 	m.calculateMatrix(oggetti, blobs);
 	vector<float> max=m.maxMatrix();
 	while(max[2]>THRESHOLD){
-	   cout<<"MAX1 "<<max[2]<<endl;
+	   //cout<<"MAX1 "<<max[2]<<endl;
 	   oggetti[max[1]].associateBlob(blobs[max[0]]);
 	   m.deleteFromMatrix(max[0],max[1]);  //cancella
 	   max=m.maxMatrix();
 	}
-	cout<<"MAX2 "<<max[2]<<endl;
+	//cout<<"MAX2 "<<max[2]<<endl;
 
 
 	vector<int> indexRemainObj=m.remainObjects();
@@ -155,6 +157,7 @@ void tracking(vector<Obj>& oggetti, vector<vector<Point> >& blobs) {
 		oggetti[i].incremGhostFrame();
 		if(oggetti[i].getGhostFrame()>GHOST_FRAME){
 			oggetti[i].setToDelete(true);
+			//cout<<"DELETE"<<endl;
 		}
 	}
 	vector<Obj> temp;
