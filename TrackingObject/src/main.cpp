@@ -77,10 +77,24 @@ int main(int argc, char** argv) {
 		findDrawBlobs(fgMaskMOG2, drawing, blobs);
 		tracking(oggetti,blobs);
 
+		vector<Point> contours_poly;
+		Rect boundRect;
 		for(auto o:oggetti){
 			//cout<<o.getName()<<" "<<o.getPositions()<<endl;
 			for(int i=0;i<o.getPositions().size();i++){
-			circle(drawing,Point(o.getPositions()[i].x,o.getPositions()[i].y),1,Scalar(o.getColor()[0],o.getColor()[1],o.getColor()[2]),1,8);}
+			circle(drawing,Point(o.getPositions()[i].x,o.getPositions()[i].y),1,Scalar(o.getColor()[0],o.getColor()[1],o.getColor()[2]),1,8);
+			//disegna rettangolo
+			approxPolyDP(Mat(o.getOldBlob()), contours_poly, 3, true); //approssima il contorno in un polinomio, il 3 indica l'accuratezza dell'approssimazione, true indica che la linea e' chiusa
+			boundRect=boundingRect(Mat(contours_poly));
+			rectangle(drawing,boundRect,Scalar(o.getColor()[0],o.getColor()[1],o.getColor()[2]),2,8,0);
+			//disegno nell'originale
+			circle(frame,Point(o.getPositions()[i].x,o.getPositions()[i].y),1,Scalar(o.getColor()[0],o.getColor()[1],o.getColor()[2]),1,8);
+			rectangle(frame,boundRect,Scalar(o.getColor()[0],o.getColor()[1],o.getColor()[2]),2,8,0);
+
+			putText(frame,to_string(o.getName()),boundRect.tl(),FONT_ITALIC,1,cvScalar(255));
+			putText(drawing,to_string(o.getName()),boundRect.tl(),FONT_ITALIC,1,cvScalar(255));
+
+			}
 		}
 
 		imshow("FG Mask MOG 2 blobs", drawing);

@@ -16,9 +16,7 @@ Obj::Obj(int name) :
 	ghostFrame = 0;
 	associatedBlob.clear();
 	RNG rng(rand());
-	color.push_back(rng.uniform(0, 255));
-	color.push_back(rng.uniform(0, 255));
-	color.push_back(rng.uniform(0, 255));
+	color={rng.uniform(0, 255),rng.uniform(0, 255),rng.uniform(0, 255)};
 }
 
 void Obj::associateBlob(vector<Point> b) {
