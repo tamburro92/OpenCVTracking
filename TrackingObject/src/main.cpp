@@ -14,6 +14,7 @@ using namespace std;
 #define MINAREA 500
 void findDrawBlobs(InputOutputArray& image, InputOutputArray& drawing, vector<vector<Point> >& blobs) ;
 void tracking(vector<Obj>& oggetti, vector<vector<Point> >& blobs);
+static int name=0;
 
 int main(int argc, char** argv) {
 	Mat frame;
@@ -185,13 +186,16 @@ void tracking(vector<Obj>& oggetti, vector<vector<Point> >& blobs) {
 	}
 	oggetti=temp;
 	vector<int> indexRemainBlob=m.remainBlobs();
-	int name;
-	if(oggetti.empty()){
-		name=0;
-	}else{
-		name=oggetti.back().getName();
-	}
+	//int name;
+	//if(oggetti.empty()){
+		//name=0;
+	//}else{
+		//name=oggetti.back().getName();
+		//name++;
+	//}
 	for(auto indexBlob:indexRemainBlob){
+		name=oggetti.back().getName();
+		name++;
 		Obj obj(name++);
 		obj.associateBlob(blobs[indexBlob]);
 		oggetti.push_back(obj);
