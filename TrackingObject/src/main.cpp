@@ -12,9 +12,10 @@
 using namespace cv;
 using namespace std;
 #define MINAREA 500
-void findDrawBlobs(InputOutputArray& image, InputOutputArray& drawing, vector<vector<Point> >& blobs) ;
+void findDrawBlobs(InputOutputArray& image, InputOutputArray& drawing,
+		vector<vector<Point> >& blobs);
 void tracking(vector<Obj>& oggetti, vector<vector<Point> >& blobs);
-static int name=0;
+static int name = 0;
 
 int main(int argc, char** argv) {
 	Mat frame;
@@ -23,7 +24,6 @@ int main(int argc, char** argv) {
 	vector<Obj> oggetti;
 	Mat kernelDilate = getStructuringElement(MORPH_RECT, Size(5, 5)); // kernel per la dilatazione, MORPH_RECT indica che e' un rettangolo
 	Mat kernelErode = getStructuringElement(MORPH_RECT, Size(3, 3)); // kernel per l'erosione, MORPH_RECT indica che e' un rettangolo
-
 
 	int keyboard;
 
@@ -76,24 +76,36 @@ int main(int argc, char** argv) {
 		Mat drawing = Mat::zeros(fgMaskMOG2.size(), CV_8UC3);
 		vector<vector<Point> > blobs;
 		findDrawBlobs(fgMaskMOG2, drawing, blobs);
-		tracking(oggetti,blobs);
+		tracking(oggetti, blobs);
 
 		vector<Point> contours_poly;
 		Rect boundRect;
-		for(auto o:oggetti){
+		for (auto o : oggetti) {
 			//cout<<o.getName()<<" "<<o.getPositions()<<endl;
-			for(int i=0;i<o.getPositions().size();i++){
-			circle(drawing,Point(o.getPositions()[i].x,o.getPositions()[i].y),1,Scalar(o.getColor()[0],o.getColor()[1],o.getColor()[2]),1,8);
-			//disegna rettangolo
-			approxPolyDP(Mat(o.getOldBlob()), contours_poly, 3, true); //approssima il contorno in un polinomio, il 3 indica l'accuratezza dell'approssimazione, true indica che la linea e' chiusa
-			boundRect=boundingRect(Mat(contours_poly));
-			rectangle(drawing,boundRect,Scalar(o.getColor()[0],o.getColor()[1],o.getColor()[2]),2,8,0);
-			//disegno nell'originale
-			circle(frame,Point(o.getPositions()[i].x,o.getPositions()[i].y),1,Scalar(o.getColor()[0],o.getColor()[1],o.getColor()[2]),1,8);
-			rectangle(frame,boundRect,Scalar(o.getColor()[0],o.getColor()[1],o.getColor()[2]),2,8,0);
+			for (int i = 0; i < o.getPositions().size(); i++) {
+				circle(drawing,
+						Point(o.getPositions()[i].x, o.getPositions()[i].y), 1,
+						Scalar(o.getColor()[0], o.getColor()[1],
+								o.getColor()[2]), 1, 8);
+				//disegna rettangolo
+				approxPolyDP(Mat(o.getOldBlob()), contours_poly, 3, true); //approssima il contorno in un polinomio, il 3 indica l'accuratezza dell'approssimazione, true indica che la linea e' chiusa
+				boundRect = boundingRect(Mat(contours_poly));
+				rectangle(drawing, boundRect,
+						Scalar(o.getColor()[0], o.getColor()[1],
+								o.getColor()[2]), 2, 8, 0);
+				//disegno nell'originale
+				circle(frame,
+						Point(o.getPositions()[i].x, o.getPositions()[i].y), 1,
+						Scalar(o.getColor()[0], o.getColor()[1],
+								o.getColor()[2]), 1, 8);
+				rectangle(frame, boundRect,
+						Scalar(o.getColor()[0], o.getColor()[1],
+								o.getColor()[2]), 2, 8, 0);
 
-			putText(frame,to_string(o.getName()),boundRect.tl(),FONT_ITALIC,1,cvScalar(255));
-			putText(drawing,to_string(o.getName()),boundRect.tl(),FONT_ITALIC,1,cvScalar(255));
+				putText(frame, to_string(o.getName()), boundRect.tl(),
+						FONT_ITALIC, 1, cvScalar(255));
+				putText(drawing, to_string(o.getName()), boundRect.tl(),
+						FONT_ITALIC, 1, cvScalar(255));
 
 			}
 		}
@@ -108,13 +120,13 @@ int main(int argc, char** argv) {
 
 }
 
-void findDrawBlobs(InputOutputArray& image, InputOutputArray& drawing, vector<vector<Point> >& blobs) {
+void findDrawBlobs(InputOutputArray& image, InputOutputArray& drawing,
+		vector<vector<Point> >& blobs) {
 	RNG rng(12345); // generatore di un numero casuale
 	vector<Point> contours_poly;
 	Point2f center;
 	float radius;
 	vector<vector<Point> > blobtemp;
-
 
 	//trova tutti i contorni dei BLOBS
 	// contours: immagine in output con i contorni rilevati, ogni contorno e' memorizzato in un vettore
@@ -131,7 +143,7 @@ void findDrawBlobs(InputOutputArray& image, InputOutputArray& drawing, vector<ve
 		approxPolyDP(Mat(blobtemp[i]), contours_poly, 3, true); //approssima il contorno in un polinomio, il 3 indica l'accuratezza dell'approssimazione, true indica che la linea e' chiusa
 		minEnclosingCircle((Mat) contours_poly, center, radius); // realizza un cerchio, vengono passati i punti, il centro, il raggio
 
-		if (contourArea(blobtemp[i]) > MINAREA){ //FUNZIONE per calcolare l'area dei BLOBs
+		if (contourArea(blobtemp[i]) > MINAREA) { //FUNZIONE per calcolare l'area dei BLOBs
 			drawContours(drawing, blobtemp, (int) i, color, 2, 8, noArray(), 0,
 					Point());
 			blobs.push_back(blobtemp[i]); // vengono aggiunti solo i blob che rispettano il vincolo su MINAREA
@@ -140,13 +152,13 @@ void findDrawBlobs(InputOutputArray& image, InputOutputArray& drawing, vector<ve
 	}
 }
 void tracking(vector<Obj>& oggetti, vector<vector<Point> >& blobs) {
-	   //cout<<"CALLED"<<endl;
+	//cout<<"CALLED"<<endl;
 
-	float THRESHOLD=0.4;
-	int GHOST_FRAME=5;
+	float THRESHOLD = 0.4;
+	int GHOST_FRAME = 5;
 	if (oggetti.empty()) { //se gli oggetti sono vuoti inizializzali a blobs
 		for (int i = 0; i < blobs.size(); i++) {
-			Obj obj(i);
+			Obj obj(name);
 			obj.associateBlob(blobs[i]);
 			obj.setOldBlob(blobs[i]);
 			oggetti.push_back(obj);
@@ -154,47 +166,48 @@ void tracking(vector<Obj>& oggetti, vector<vector<Point> >& blobs) {
 		return;
 	}
 
-	for(auto o:oggetti) //ad inizio iterazione deassocio tutto
+	for (auto o : oggetti) //ad inizio iterazione deassocio tutto
 		o.deassociateBlob();
-	cout<<"blobs.size :"<<blobs.size()<<endl;
+	cout << "blobs.size :" << blobs.size() << endl;
 	MatrixSimilarity m(blobs.size(), oggetti.size());
 	m.calculateMatrix(oggetti, blobs);
-	vector<float> max=m.maxMatrix();
-	while(max[2]>THRESHOLD){
-	   //cout<<"MAX1 "<<max[2]<<endl;
-	   oggetti[max[1]].associateBlob(blobs[max[0]]);
-	   m.deleteFromMatrix(max[0],max[1]);  //cancella
-	   max=m.maxMatrix();
+	vector<float> max = m.maxMatrix();
+	while (max[2] > THRESHOLD) {
+		//cout<<"MAX1 "<<max[2]<<endl;
+		oggetti[max[1]].associateBlob(blobs[max[0]]);
+		m.deleteFromMatrix(max[0], max[1]);  //cancella
+		max = m.maxMatrix();
 	}
 	//cout<<"MAX2 "<<max[2]<<endl;
 
-
-	vector<int> indexRemainObj=m.remainObjects();
+	vector<int> indexRemainObj = m.remainObjects();
 	vector<int> indexToRemove;
-	for(auto i:indexRemainObj){
+	for (auto i : indexRemainObj) {
 		oggetti[i].incremGhostFrame();
-		if(oggetti[i].getGhostFrame()>GHOST_FRAME){
+		if (oggetti[i].getGhostFrame() > GHOST_FRAME) {
 			oggetti[i].setToDelete(true);
 			//cout<<"DELETE"<<endl;
 		}
 	}
 	vector<Obj> temp;
-	for(auto obj:oggetti){
-		if(obj.getToDelete()==false){
+	for (auto obj : oggetti) {
+		if (obj.getToDelete() == false) {
 			temp.push_back(obj);
 		}
 	}
-	oggetti=temp;
-	vector<int> indexRemainBlob=m.remainBlobs();
+	oggetti = temp;
+	vector<int> indexRemainBlob = m.remainBlobs();
 	//int name;
 	//if(oggetti.empty()){
-		//name=0;
+	//name=0;
 	//}else{
-		//name=oggetti.back().getName();
-		//name++;
+	//name=oggetti.back().getName();
+	//name++;
 	//}
-	for(auto indexBlob:indexRemainBlob){
-		name=oggetti.back().getName();
+	for (auto indexBlob : indexRemainBlob) {
+		if (!oggetti.empty()) {
+			name = oggetti.back().getName();
+		}
 		name++;
 		Obj obj(name++);
 		obj.associateBlob(blobs[indexBlob]);
