@@ -12,8 +12,7 @@
 using namespace cv;
 using namespace std;
 #define MINAREA 500
-void findDrawBlobs(InputOutputArray& image, InputOutputArray& drawing,
-		vector<vector<Point> >& blobs);
+void findDrawBlobs(InputOutputArray& image, InputOutputArray& drawing, vector<vector<Point> >& blobs);
 void tracking(vector<Obj>& oggetti, vector<vector<Point> >& blobs);
 static int name = 0;
 
@@ -59,7 +58,6 @@ int main(int argc, char** argv) {
 			exit(EXIT_FAILURE);
 		}
 
-		//	GaussianBlur( frame, frame, Size( 3, 3 ), 0, 0 );
 
 		backGroundSubMOG2->operator ()(frame, fgMaskMOG2, learningRate); // aggiorna il modello del background e calcola la foreground mask
 
@@ -81,7 +79,6 @@ int main(int argc, char** argv) {
 		vector<Point> contours_poly;
 		Rect boundRect;
 		for (auto o : oggetti) {
-			//cout<<o.getName()<<" "<<o.getPositions()<<endl;
 			for (int i = 0; i < o.getPositions().size(); i++) {
 				circle(drawing,
 						Point(o.getPositions()[i].x, o.getPositions()[i].y), 1,
@@ -152,8 +149,6 @@ void findDrawBlobs(InputOutputArray& image, InputOutputArray& drawing,
 	}
 }
 void tracking(vector<Obj>& oggetti, vector<vector<Point> >& blobs) {
-	//cout<<"CALLED"<<endl;
-
 	float THRESHOLD = 0.4;
 	int GHOST_FRAME = 5;
 	if (oggetti.empty()) { //se gli oggetti sono vuoti inizializzali a blobs
@@ -173,12 +168,10 @@ void tracking(vector<Obj>& oggetti, vector<vector<Point> >& blobs) {
 	m.calculateMatrix(oggetti, blobs);
 	vector<float> max = m.maxMatrix();
 	while (max[2] > THRESHOLD) {
-		//cout<<"MAX1 "<<max[2]<<endl;
 		oggetti[max[1]].associateBlob(blobs[max[0]]);
 		m.deleteFromMatrix(max[0], max[1]);  //cancella
 		max = m.maxMatrix();
 	}
-	//cout<<"MAX2 "<<max[2]<<endl;
 
 	vector<int> indexRemainObj = m.remainObjects();
 	vector<int> indexToRemove;
@@ -186,7 +179,6 @@ void tracking(vector<Obj>& oggetti, vector<vector<Point> >& blobs) {
 		oggetti[i].incremGhostFrame();
 		if (oggetti[i].getGhostFrame() > GHOST_FRAME) {
 			oggetti[i].setToDelete(true);
-			//cout<<"DELETE"<<endl;
 		}
 	}
 	vector<Obj> temp;
@@ -197,13 +189,7 @@ void tracking(vector<Obj>& oggetti, vector<vector<Point> >& blobs) {
 	}
 	oggetti = temp;
 	vector<int> indexRemainBlob = m.remainBlobs();
-	//int name;
-	//if(oggetti.empty()){
-	//name=0;
-	//}else{
-	//name=oggetti.back().getName();
-	//name++;
-	//}
+
 	for (auto indexBlob : indexRemainBlob) {
 		if (!oggetti.empty()) {
 			name = oggetti.back().getName();

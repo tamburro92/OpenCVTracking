@@ -27,7 +27,6 @@ void Obj::associateBlob(vector<Point> b) {
 }
 
 void Obj::deassociateBlob() {
-	//oldBlob = associatedBlob; //mantengo come ultimo blob il piu' recente
 	associatedBlob.clear(); // viene eliminato il contenuto di associatedBlob
 }
 
