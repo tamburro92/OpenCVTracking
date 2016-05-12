@@ -18,8 +18,8 @@ private:
 	vector<Point> positions; // vettore di punti
 	vector<int> color;
 	int name;
-	int ghostFrame;
 	bool toDelete;
+	int ghostFrame;
 public:
 	/**
 	 * Costruttore
