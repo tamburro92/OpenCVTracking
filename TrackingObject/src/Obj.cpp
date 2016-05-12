@@ -12,8 +12,7 @@ using namespace std;
 using std::vector;
 
 Obj::Obj(int name) :
-		name(name), toDelete(false) {
-	ghostFrame = 0;
+		name(name), ghostFrame(0), toDelete(false)  {
 	associatedBlob.clear();
 	RNG rng(rand());
 	color.push_back(rng.uniform(0, 255));
